@@ -140,7 +140,7 @@ class SLICE_OT(bpy.types.Operator):
         
         ob = objectToClone.copy()
         ob.data = objectToClone.data.copy()
-        bpy.data.collections["Collection"].objects.link(ob)
+        objectToClone.users_collection[0].objects.link(ob)
         bpy.ops.object.select_all(action='DESELECT')
         ob.select_set(True)
         bpy.context.view_layer.objects.active = ob
@@ -150,7 +150,6 @@ class SLICE_OT(bpy.types.Operator):
     
     #PERFORMS THE BOOL OPERATION
     def doBool(self, src, object, operation):
-        
         boolmod = src.modifiers.new("Bool", 'BOOLEAN')
         boolmod.object = object
         boolmod.solver = 'EXACT'
@@ -185,11 +184,11 @@ class SLICE_OT(bpy.types.Operator):
         #MAIN LOOP 
         for index in range(len(selectedObjects)):
             newActiveObjects = []
-      
+
             for active in activeObjects:
                 newObj = self.cloneObject(active)
                 self.doBool(newObj,self.slicerContainers[index].left,'DIFFERENCE')
-   
+
                 if(len(newObj.data.vertices) == 0):
                     bpy.ops.object.delete()
                 else:
@@ -197,7 +196,7 @@ class SLICE_OT(bpy.types.Operator):
                     #USE INDEX TO AVOID REMOVING THE RESULT OF LAST SLICING LOOP
                     if newObj not in objectsToRemove and index < loopCount:
                         objectsToRemove.append(newObj)
-                
+
                 newObj = self.cloneObject(active)
                 self.doBool(newObj,self.slicerContainers[index].right,'DIFFERENCE')
 
